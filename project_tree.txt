@@ -1,0 +1,49 @@
+devops-portfolio-lab/
+├── README.md
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── terraform/
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   └── modules/
+│       ├── vpc/
+│       ├── eks/
+│       └── rds/
+├── ansible/
+│   └── playbook.yml
+├── helm-charts/
+│   └── microservices/
+│       ├── Chart.yaml
+│       ├── values.yaml
+│       └── templates/
+│           ├── deployment.yaml
+│           ├── service.yaml
+│           └── ingress.yaml
+├── k8s-manifests/
+│   ├── namespace.yaml
+│   ├── configmap.yaml
+│   └── secrets.yaml
+├── services/
+│   ├── user-service/
+│   │   ├── app.py
+│   │   ├── requirements.txt
+│   │   └── Dockerfile
+│   ├── product-service/
+│   │   ├── app.py
+│   │   ├── requirements.txt
+│   │   └── Dockerfile
+│   ├── order-service/
+│   │   ├── app.py
+│   │   ├── requirements.txt
+│   │   └── Dockerfile
+│   └── notification-service/
+│       ├── app.py
+│       ├── requirements.txt
+│       └── Dockerfile
+├── database/
+│   ├── init.sql
+│   └── Dockerfile
+└── automation/
+    └── backup.py

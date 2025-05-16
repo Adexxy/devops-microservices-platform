@@ -1,0 +1,58 @@
+services:
+  user:
+    image: your-dockerhub/user-service:latest
+    port: 80
+  product:
+    image: your-dockerhub/product-service:latest
+    port: 80
+  order:
+    image: your-dockerhub/order-service:latest
+    port: 80
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+  notification:
+    image: your-dockerhub/notification-service:latest
+    port: 80
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: microservices.local
+      paths:
+        - path: /user
+          service: user
+        - path: /product
+          service: product
+        - path: /order
+          service: order
+        - path: /notification
+          service: notification
+
+
+
+
+# replicaCount: 2
+# image:
+#   repository: <ECR_URI>/microservices
+#   pullPolicy: IfNotPresent
+# service:
+#   type: ClusterIP
+#   port: 80
+# ingress:
+#   enabled: true
+#   host: example.com

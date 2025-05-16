@@ -1,0 +1,35 @@
+{{- range $name, $svc := .Values.services }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+    spec:
+      containers:
+        - name: {{ $name }}
+          image: {{ $svc.image }}
+          ports:
+            - containerPort: {{ $svc.port }}
+          {{- if $svc.resources }}
+          resources:
+            {{- if $svc.resources.requests }}
+            requests:
+              cpu: {{ $svc.resources.requests.cpu | quote }}
+              memory: {{ $svc.resources.requests.memory | quote }}
+            {{- end }}
+            {{- if $svc.resources.limits }}
+            limits:
+              cpu: {{ $svc.resources.limits.cpu | quote }}
+              memory: {{ $svc.resources.limits.memory | quote }}
+            {{- end }}
+          {{- end }}
+---
+{{- end }}
