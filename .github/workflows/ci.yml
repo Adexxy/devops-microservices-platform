@@ -35,17 +35,17 @@ jobs:
             docker push $REGISTRY/$IMAGE_OWNER/${svc}-service:latest
           done
 
-      - name: Setup Helm
-        uses: azure/setup-helm@v3
+      # - name: Setup Helm
+      #   uses: azure/setup-helm@v3
 
-      - name: Set up Kubeconfig
-        run: echo "$KUBECONFIG_SECRET" > kubeconfig.yaml
-        env:
-          KUBECONFIG_SECRET: ${{ secrets.KUBECONFIG_SECRET }}
+      # - name: Set up Kubeconfig
+      #   run: echo "$KUBECONFIG_SECRET" > kubeconfig.yaml
+      #   env:
+      #     KUBECONFIG_SECRET: ${{ secrets.KUBECONFIG_SECRET }}
 
-      - name: Deploy with Helm
-        run: |
-          helm upgrade --install microservices helm/microservices -f helm/microservices/values.yaml --kubeconfig kubeconfig.yaml
+      # - name: Deploy with Helm
+      #   run: |
+      #     helm upgrade --install microservices helm/microservices -f helm/microservices/values.yaml --kubeconfig kubeconfig.yaml
 
 
 
