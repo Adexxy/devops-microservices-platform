@@ -27,7 +27,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [user-service, product-service, notification-service, order-service]
+        service: [user_service, product_service, notification_service, order_service]
 
     defaults:
       run:
