@@ -15,6 +15,7 @@ env:
   # KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
   HELM_RELEASE: devops-app
   HELM_NAMESPACE: default
+  PYTHONPATH: ${{ github.workspace }}
 
 permissions:
   contents: read
