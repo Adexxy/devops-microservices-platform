@@ -9,6 +9,7 @@ ORDER_SERVICE_URL = "http://order-service.microservices.svc.cluster.local"
 def health():
     return jsonify({'status': 'ok'}), 200
 
+
 @app.route('/notify', methods=['POST'])
 def send_notification():
     data = request.get_json()
@@ -20,6 +21,7 @@ def send_notification():
     # In real-world, push to email/SMS queue
     print(f"Notification: Order {{order_id}} processed.")
     return {'status': 'sent'}
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)

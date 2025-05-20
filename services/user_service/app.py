@@ -12,9 +12,11 @@ users = [
 def health():
     return jsonify({'status': 'ok'}), 200
 
+
 @app.route('/users', methods=['GET'])
 def list_users():
     return jsonify(users)
+
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
@@ -22,6 +24,7 @@ def get_user(user_id):
     if not u:
         abort(404)
     return jsonify(u)
+
 
 @app.route('/users', methods=['POST'])
 def create_user():
@@ -32,6 +35,7 @@ def create_user():
     user = {'id': new_id, 'name': data['name']}
     users.append(user)
     return jsonify(user), 201
+
 
 @app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
@@ -44,24 +48,14 @@ def update_user(user_id):
     u['name'] = data['name']
     return jsonify(u)
 
+
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     global users
     users = [u for u in users if u['id'] != user_id]
     return '', 204
 
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
 
-
-
-
-# from flask import Flask, jsonify
-# app = Flask(__name__)
-
-# @app.route('/users')
-# def list_users():
-#     return jsonify([{'id': 1, 'name': 'Alice'}])
-
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', port=80)

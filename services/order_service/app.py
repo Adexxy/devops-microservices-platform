@@ -10,9 +10,11 @@ PRODUCT_SERVICE_URL = "http://product-service.microservices.svc.cluster.local"
 def health():
     return jsonify({'status': 'ok'}), 200
 
+
 @app.route('/orders', methods=['GET'])
 def list_orders():
     return jsonify(ORDERS)
+
 
 @app.route('/orders', methods=['POST'])
 def create_order():
@@ -29,5 +31,7 @@ def create_order():
     ORDERS.append(order)
     return jsonify(order), 201
 
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
+

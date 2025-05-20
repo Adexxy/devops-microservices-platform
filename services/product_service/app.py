@@ -8,13 +8,16 @@ products = [
     {'id': 2, 'name': 'Gadget', 'price': 12.49}
 ]
 
+
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok'}), 200
 
+
 @app.route('/products', methods=['GET'])
 def list_products():
     return jsonify(products)
+
 
 @app.route('/products/<int:product_id>', methods=['GET'])
 def get_product(product_id):
@@ -23,6 +26,7 @@ def get_product(product_id):
         return jsonify({'error': 'Not found'}), 404
     return jsonify(p)
 
+
 @app.route('/products', methods=['POST'])
 def create_product():
     data = request.get_json()
@@ -30,6 +34,7 @@ def create_product():
     product = {'id': new_id, 'name': data['name'], 'price': data['price']}
     products.append(product)
     return jsonify(product), 201
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
