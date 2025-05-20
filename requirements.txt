@@ -1,0 +1,9 @@
+# Base test tools
+pytest
+flake8
+
+# App dependencies
+Flask==2.3.3
+requests==2.31.0
+sqlalchemy==2.0.29
+pymysql==1.1.0
