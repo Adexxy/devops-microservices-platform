@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort # type: ignore
 app = Flask(__name__)
 
 # In-memory store
@@ -6,6 +6,7 @@ users = [
     {'id': 1, 'name': 'Alice'},
     {'id': 2, 'name': 'Bob'}
 ]
+
 
 # Health check endpoint
 @app.route('/health', methods=['GET'])
@@ -45,7 +46,7 @@ def update_user(user_id):
         abort(404)
     if not data or 'name' not in data:
         abort(400)
-    u['name'] = data['name']
+    u['name'] = data['name'] # type: ignore
     return jsonify(u)
 
 
@@ -58,4 +59,3 @@ def delete_user(user_id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
-

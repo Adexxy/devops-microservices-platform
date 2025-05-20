@@ -1,10 +1,11 @@
 # services/order-service/app.py
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request # type: ignore
 import requests
 app = Flask(__name__)
 
 ORDERS = []
 PRODUCT_SERVICE_URL = "http://product-service.microservices.svc.cluster.local"
+
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -34,4 +35,3 @@ def create_order():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
-

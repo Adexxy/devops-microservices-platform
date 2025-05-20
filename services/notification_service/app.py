@@ -1,9 +1,10 @@
 # services/notification-service/app.py
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify # type: ignore
 import requests
 app = Flask(__name__)
 
 ORDER_SERVICE_URL = "http://order-service.microservices.svc.cluster.local"
+
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -19,7 +20,7 @@ def send_notification():
     if resp.status_code != 200:
         return {'status': 'failed'}, 500
     # In real-world, push to email/SMS queue
-    print(f"Notification: Order {{order_id}} processed.")
+    print(f"Notification: Order {order_id} processed.")
     return {'status': 'sent'}
 
 
