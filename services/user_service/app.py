@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, abort # type: ignore
+from flask import Flask, jsonify, request, abort  # type: ignore
 app = Flask(__name__)
 
 # In-memory store
@@ -46,7 +46,7 @@ def update_user(user_id):
         abort(404)
     if not data or 'name' not in data:
         abort(400)
-    u['name'] = data['name'] # type: ignore
+    u['name'] = data['name']  # type: ignore
     return jsonify(u)
 
 

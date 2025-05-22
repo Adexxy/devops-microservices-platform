@@ -1,5 +1,5 @@
 # services/notification-service/app.py
-from flask import Flask, request, jsonify # type: ignore
+from flask import Flask, request, jsonify  # type: ignore
 import requests
 app = Flask(__name__)
 

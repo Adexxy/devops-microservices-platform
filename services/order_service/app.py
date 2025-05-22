@@ -1,5 +1,5 @@
 # services/order-service/app.py
-from flask import Flask, jsonify, request # type: ignore
+from flask import Flask, jsonify, request  # type: ignore
 import requests
 app = Flask(__name__)
 

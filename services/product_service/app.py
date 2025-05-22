@@ -1,5 +1,5 @@
 # services/product-service/app.py
-from flask import Flask, jsonify, request # type: ignore
+from flask import Flask, jsonify, request  # type: ignore
 app = Flask(__name__)
 
 # In-memory product store
