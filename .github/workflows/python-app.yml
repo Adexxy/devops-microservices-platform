@@ -81,12 +81,12 @@ jobs:
 
     strategy:
       matrix:
-        service: [user-service, product-service, notification-service, order-service]
+        service: [user_service, product_service, notification_service, order_service]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
       - name: Set up Docker Buildx
         run: docker buildx create --use
 
