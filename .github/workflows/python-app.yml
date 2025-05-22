@@ -107,6 +107,8 @@ jobs:
 
       - name: Build and push Postgres image
         if: ${{ matrix.service == 'postgres' }}
+        working-directory: |
+          ${{ matrix.service == 'postgres' && 'database/postgres' || format('services/{0}', matrix.service) }}
         run: |
           docker build -t $REGISTRY/$IMAGE_PREFIX/postgres:${{ env.IMAGE_TAG }} .
           docker push $REGISTRY/$IMAGE_PREFIX/postgres:${{ env.IMAGE_TAG }}
