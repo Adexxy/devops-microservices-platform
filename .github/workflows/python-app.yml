@@ -82,12 +82,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [user_service, product_service, notification_service, order_service, postgres]
-
-    # defaults:
-    #   run:
-    #     working-directory: |
-    #       ${{ matrix.service == 'postgres' && 'database/postgres' || format('services/{0}', matrix.service) }}
+        service: [user_service, product_service, notification_service, order_service, database]
 
     steps:
       - name: Checkout code
@@ -100,18 +95,16 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build and push image
-        if: ${{ matrix.service != 'postgres' }}
+        if: ${{ matrix.service != 'database' }}
         run: |
           docker build -t $REGISTRY/$IMAGE_PREFIX/${{ matrix.service }}:${{ env.IMAGE_TAG }} ./services/${{ matrix.service }}
           docker push $REGISTRY/$IMAGE_PREFIX/${{ matrix.service }}:${{ env.IMAGE_TAG }}
 
       - name: Build and push Postgres image
-        if: ${{ matrix.service == 'postgres' }}
-        # working-directory: |
-        #   ./database/${{ matrix.service }}
+        if: ${{ matrix.service == 'database' }}
         run: |
-          docker build -t $REGISTRY/$IMAGE_PREFIX/postgres:${{ env.IMAGE_TAG }} ./database/${{ matrix.service }}
-          docker push $REGISTRY/$IMAGE_PREFIX/postgres:${{ env.IMAGE_TAG }}
+          docker build -t $REGISTRY/$IMAGE_PREFIX/postgres:${{ env.IMAGE_TAG }} .${{ matrix.service }}
+          docker push $REGISTRY/$IMAGE_PREFIX/${{ matrix.service }}:${{ env.IMAGE_TAG }}
 
   deploy_to_server:
     name: Deploy to Server
