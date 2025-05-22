@@ -130,15 +130,15 @@ jobs:
       #     echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
       #     chmod 600 $HOME/.kube/config
 
-      - name: Deploy to Kubernetes
-        run: |
-          helm upgrade --install $HELM_RELEASE \
-          ./helm-charts/microservices \
-          --namespace $HELM_NAMESPACE \
-          --create-namespace \
-          --set image.tag=${{ env.IMAGE_TAG }} \
-          --dry-run --debug
-          # --wait
+      # - name: Deploy to Kubernetes
+      #   run: |
+      #     helm upgrade --install $HELM_RELEASE \
+      #     ./helm-charts/microservices \
+      #     --namespace $HELM_NAMESPACE \
+      #     --create-namespace \
+      #     --set image.tag=${{ env.IMAGE_TAG }} \
+      #     --dry-run --debug
+      #     # --wait
 
 
 
