@@ -1,13 +1,13 @@
 services:
   user:
     image: your-dockerhub/user-service:latest
-    port: 80
+    port: 5001
   product:
     image: your-dockerhub/product-service:latest
-    port: 80
+    port: 5002
   order:
     image: your-dockerhub/order-service:latest
-    port: 80
+    port: 5003
     resources:
       requests:
         cpu: "200m"
@@ -17,7 +17,7 @@ services:
         memory: "512Mi"
   notification:
     image: your-dockerhub/notification-service:latest
-    port: 80
+    port: 5004
     resources:
       requests:
         cpu: "200m"
