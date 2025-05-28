@@ -265,6 +265,9 @@ jobs:
       ########################################
       - name: Debug kubeconfig
         run: |
+          aws sts get-caller-identity
+          kubectl config current-context
+          kubectl get nodes
           kubectl config view
           kubectl get nodes || true
 
