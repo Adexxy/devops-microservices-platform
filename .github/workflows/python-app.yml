@@ -144,9 +144,9 @@ jobs:
         id: vars
         run: |
           if [[ "${{ github.event.inputs.registry }}" == "ecr" ]]; then
-            echo "repo=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_PREFIX }}" >> $GITHUB_OUTPUT
+            echo "repo=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ matrix.service }}" >> $GITHUB_OUTPUT
           else
-            echo "repo=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_PREFIX }}" >> $GITHUB_OUTPUT
+            echo "repo=${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}" >> $GITHUB_OUTPUT
           fi
 
 
@@ -159,8 +159,8 @@ jobs:
           if [[ "${{ matrix.service }}" == "database" ]]; then
             SERVICE_DIR="./database"
           fi
-          docker build -t ${{ steps.vars.outputs.repo }}/${{ matrix.service }}:${{ env.IMAGE_TAG }} $SERVICE_DIR
-          docker push ${{ steps.vars.outputs.repo }}/${{ matrix.service }}:${{ env.IMAGE_TAG }}
+          docker build -t ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }} $SERVICE_DIR
+          docker push ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }}
 
 
       # - name: Build and push image
