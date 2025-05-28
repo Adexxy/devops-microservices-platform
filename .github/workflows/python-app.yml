@@ -261,6 +261,14 @@ jobs:
           done
 
       ########################################
+      # Debugging and Verification
+      ########################################
+      - name: Debug kubeconfig
+        run: |
+          kubectl config view
+          kubectl get nodes || true
+
+      ########################################
       # Deploy to Kubernetes (generic or EKS)
       ########################################
 
