@@ -188,6 +188,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
+    env:
+      REGISTRY: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.registry || 'ecr' }}
+      TARGET: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target || 'eks' }}
+
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -260,7 +265,7 @@ jobs:
       ########################################
 
       - name: Deploy with Helm
-        if: ${{ github.event.inputs.target == 'generic' || github.event.inputs.target == 'eks' }}
+        if: env.TARGET == 'generic' || env.TARGET == 'eks'
         run: |
           helm upgrade --install $HELM_RELEASE \
           ./helm-charts/microservices \
