@@ -7,6 +7,7 @@ lab1.md
 *.tfstate
 *.tfstate.*
 crash.log
+tfplan
 *.tfplan
 terraform.tfvars
 override.tf
