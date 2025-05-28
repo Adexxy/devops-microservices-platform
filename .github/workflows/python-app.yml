@@ -29,13 +29,16 @@ on:
             - ecr
 
 env:
-  REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+  # REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
   # REGISTRY: docker.io
+  REGISTRY: ${{ github.event.inputs.registry || 'ecr' }}
   IMAGE_PREFIX: ${{ secrets.DOCKER_USERNAME }}
   IMAGE_TAG: ${{ github.sha }}
   HELM_RELEASE: microservices-app
   HELM_NAMESPACE: microservises
   PYTHONPATH: ${{ github.workspace }}
+  TARGET: ${{ github.event.inputs.target || 'eks' }}
+  REGISTRY_INPUT: ${{ github.event.inputs.registry || 'ecr' }}
 
 permissions:
   contents: read
@@ -143,7 +146,7 @@ jobs:
       - name: Set image repo
         id: vars
         run: |
-          if [[ "${{ github.event.inputs.registry }}" == "ecr" ]]; then
+          if [[ "$REGISTRY" == "ecr" ]]; then
             echo "repo=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ matrix.service }}" >> $GITHUB_OUTPUT
           else
             echo "repo=${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}" >> $GITHUB_OUTPUT
