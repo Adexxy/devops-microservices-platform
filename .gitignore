@@ -1,1 +1,46 @@
+# Ignore the lab1 markdown file
 lab1.md
+
+# === Terraform files ===
+.terraform/
+*.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfplan
+terraform.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# === Local sensitive Terraform files ===
+*.pem
+*.key
+*.crt
+*.env
+.secrets/
+*.auto.tfvars
+
+# === Ignore bootstrap artifacts ===
+bootstrap/.terraform/
+bootstrap/*.tfstate
+bootstrap/*.tfstate.*
+bootstrap/*.tfplan
+
+# === Ignore OS and editor metadata ===
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.bak
+
+# === Ignore logs ===
+*.log
+
+# === Optional: Ignore output folders or build artifacts if any ===
+dist/
+build/
+out/
+
