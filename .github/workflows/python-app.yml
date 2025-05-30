@@ -66,7 +66,11 @@ jobs:
 
   test:
     name: Run Tests
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest   
+
+    env:
+      DATABASE_URL: "sqlite:///:memory:"
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
