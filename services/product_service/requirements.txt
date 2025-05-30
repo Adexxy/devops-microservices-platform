@@ -1,9 +1,10 @@
+# requirements.txt for product_service
 Flask==2.3.3
 Werkzeug>=2.3.0,<3.0.0
 flask_sqlalchemy==3.0.2
 sqlalchemy==2.0.29
 psycopg2-binary==2.9.6
 requests==2.31.0
-pytest
+pytest==7.1.2
 flake8
 pymysql==1.1.0
