@@ -3,6 +3,10 @@ from services.product_service.app import app as product_app
 
 test_client = product_app.test_client()
 
+@pytest.fixture
+def client():
+    return product_app.test_client()
+
 def test_health():
     resp = test_client.get('/health')
     assert resp.status_code == 200
