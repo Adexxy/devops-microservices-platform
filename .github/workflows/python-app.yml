@@ -189,6 +189,19 @@ jobs:
         if: failure()
         run: docker logs test_${{ matrix.service }}
 
+      - name: Set up Docker Compose
+        run: |
+          docker compose up -d
+          sleep 10
+
+      - name: Run integration tests
+        run: |
+          curl --fail -X POST http://localhost:5001/users -H "Content-Type: application/json" -d '{"name": "TestUser"}'
+          curl --fail -X POST http://localhost:5002/products -H "Content-Type: application/json" -d '{"name": "TestProduct", "price": 10.0}'
+          curl --fail -X POST http://localhost:5003/orders -H "Content-Type: application/json" -d '{"product_id": 1, "quantity": 1}'
+          curl --fail -X POST http://localhost:5004/notify -H "Content-Type: application/json" -d '{"order_id": 1}'
+
+
       - name: Cleanup
         if: always()
         run: docker rm -f test_${{ matrix.service }} || true
