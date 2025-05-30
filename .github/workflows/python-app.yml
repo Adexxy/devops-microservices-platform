@@ -100,7 +100,7 @@ jobs:
             echo "No tests to run"
           fi
 
-  build_with_smoke_test:
+  build_and_smoke_test:
     name: Build, Smoke Test and Push Docker Images
     needs: test
     runs-on: ubuntu-latest
@@ -179,32 +179,15 @@ jobs:
 
       - name: Run container
         run: |
-          # docker run -d --name test_${{ matrix.service }} -p ${{ steps.port.outputs.PORT }}:${{ steps.port.outputs.PORT }} ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }}
-          # sleep 5
-          docker run -d --name user_service -p 5001:5001 ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }}
-          docker run -d --name product_service -p 5002:5002 ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }}
-          docker run -d --name order_service -p 5003:5003 ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }}
-          docker run -d --name notification_service -p 5004:5004 ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }}
-          sleep 10
+          docker run -d --name test_${{ matrix.service }} -p ${{ steps.port.outputs.PORT }}:${{ steps.port.outputs.PORT }} ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }}
+          sleep 5
 
       - name: Check /health endpoint
-        run: |
-          curl --fail http://localhost:5001/health
-          curl --fail http://localhost:5002/health
-          curl --fail http://localhost:5003/health
-          curl --fail http://localhost:5004/health
+        run: curl --fail http://localhost:${{ steps.port.outputs.PORT }}/health
 
       - name: Debug container logs on failure
         if: failure()
         run: docker logs test_${{ matrix.service }}
-
-      - name: Run integration tests
-        run: |
-          curl --fail -X POST http://localhost:5001/users -H "Content-Type: application/json" -d '{"name": "TestUser"}'
-          curl --fail -X POST http://localhost:5002/products -H "Content-Type: application/json" -d '{"name": "TestProduct", "price": 10.0}'
-          curl --fail -X POST http://localhost:5003/orders -H "Content-Type: application/json" -d '{"product_id": 1, "quantity": 1}'
-          curl --fail -X POST http://localhost:5004/notify -H "Content-Type: application/json" -d '{"order_id": 1}'
-
 
       - name: Cleanup
         if: always()
@@ -215,26 +198,25 @@ jobs:
           docker push ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }}
 
 
-  # integration_test:
-  #   name: Integration Test
-  #   needs: build_with_smoke_test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
+  integration-test:
+    needs: build_and_smoke_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run all containers
+        run: |
+          docker run -d --name user_service -p 5001:5001 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/user_service:${{ env.IMAGE_TAG }}
+          docker run -d --name product_service -p 5002:5002 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/product_service:${{ env.IMAGE_TAG }}
+          docker run -d --name order_service -p 5003:5003 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/order_service:${{ env.IMAGE_TAG }}
+          docker run -d --name notification_service -p 5004:5004  ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/notification_service:${{ env.IMAGE_TAG }}
+          sleep 10  # allow all to boot
 
-  #     - name: Set up Docker Compose
-  #       run: |
-  #         docker compose up -d
-  #         sleep 10
+      - name: Run integration tests
+        run: |
+          curl --fail -X POST http://localhost:5001/users -H "Content-Type: application/json" -d '{"name": "TestUser"}'
+          curl --fail -X POST http://localhost:5002/products -H "Content-Type: application/json" -d '{"name": "TestProduct", "price": 10.0}'
+          curl --fail -X POST http://localhost:5003/orders -H "Content-Type: application/json" -d '{"product_id": 1, "quantity": 1}'
+          curl --fail -X POST http://localhost:5004/notify -H "Content-Type: application/json" -d '{"order_id": 1}'
 
-  #     - name: Run integration tests
-  #       run: |
-  #         curl --fail -X POST http://localhost:5001/users -H "Content-Type: application/json" -d '{"name": "TestUser"}'
-  #         curl --fail -X POST http://localhost:5002/products -H "Content-Type: application/json" -d '{"name": "TestProduct", "price": 10.0}'
-  #         curl --fail -X POST http://localhost:5003/orders -H "Content-Type: application/json" -d '{"product_id": 1, "quantity": 1}'
-  #         curl --fail -X POST http://localhost:5004/notify -H "Content-Type: application/json" -d '{"order_id": 1}'
-
-  #     - name: Cleanup
-  #       if: always()
-  #       run: docker compose down
+      - name: Cleanup
+        if: always()
+        run: docker rm -f user_service product_service order_service notification_service || true
