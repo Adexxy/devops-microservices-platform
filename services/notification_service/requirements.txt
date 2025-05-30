@@ -1,5 +1,5 @@
 # services/notification-service/requirements.txt
-Flask==2.1.2
+Flask
 requests==2.28.1
 pytest==7.1.2
 flask_sqlalchemy==3.0.2
