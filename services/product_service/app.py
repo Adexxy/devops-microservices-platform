@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy  # type: ignore
 app = Flask(__name__)
 
 # Configure your RDS PostgreSQL connection here
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://<user>:<password>@<rds-endpoint>:5432/<dbname>'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://microservices_admin_user:terraform-20250528123341691300000007.c5e88my66wu5.us-east-1.rds.amazonaws.com:5432/microservices_platform_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 

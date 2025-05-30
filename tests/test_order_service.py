@@ -1,4 +1,4 @@
-import pytest
+import pytest   # type: ignore
 from unittest.mock import patch
 from services.order_service.app import app as order_app
 

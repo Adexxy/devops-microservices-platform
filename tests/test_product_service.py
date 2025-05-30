@@ -1,4 +1,4 @@
-import pytest
+import pytest   # type: ignore
 from services.product_service.app import app as product_app
 
 test_client = product_app.test_client()
