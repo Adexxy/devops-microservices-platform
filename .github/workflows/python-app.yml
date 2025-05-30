@@ -189,7 +189,6 @@ jobs:
 
       - name: Check /health endpoint
         run: |
-          # curl --fail http://localhost:${{ steps.port.outputs.PORT }}/health
           curl --fail http://localhost:5001/health
           curl --fail http://localhost:5002/health
           curl --fail http://localhost:5003/health
