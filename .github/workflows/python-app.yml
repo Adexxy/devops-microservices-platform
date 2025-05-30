@@ -189,11 +189,6 @@ jobs:
         if: failure()
         run: docker logs test_${{ matrix.service }}
 
-      - name: Set up Docker Compose
-        run: |
-          docker compose up -d
-          sleep 10
-
       - name: Run integration tests
         run: |
           curl --fail -X POST http://localhost:5001/users -H "Content-Type: application/json" -d '{"name": "TestUser"}'
