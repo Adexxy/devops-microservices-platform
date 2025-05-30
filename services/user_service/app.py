@@ -55,7 +55,7 @@ def create_user():
 @app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     data = request.get_json()
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         abort(404)
     if not data or 'name' not in data:
