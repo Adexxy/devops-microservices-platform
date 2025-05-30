@@ -1,7 +1,0 @@
-# Not used in the workflow since the namespace is
-# automatically created in the `deploy_to_server` job by helm
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: microservices

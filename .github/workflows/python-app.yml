@@ -100,8 +100,8 @@ jobs:
             echo "No tests to run"
           fi
 
-  build:
-    name: Build and Push Docker Images
+  build_with_smoke_test:
+    name: Build, Smoke Test and Push Docker Images
     needs: test
     runs-on: ubuntu-latest
 
@@ -157,10 +157,50 @@ jobs:
 
 
       ##############################
-      # Build and Push
+      # Build, Smoke_test and Push
       ##############################
-      - name: Build and push image
+      - name: Build
         run: |
           SERVICE_DIR="./services/${{ matrix.service }}"
           docker build -t ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }} $SERVICE_DIR
+
+      - name: Run container
+        run: |
+          docker run -d --name test_${{ matrix.service }} -p 5000:5000 test/${{ matrix.service }}:latest
+          sleep 5
+
+      - name: Check /health endpoint
+        run: curl --fail http://localhost:5000/health
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f test_${{ matrix.service }} || true
+
+      - name: Push Docker image
+        run: |
           docker push ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }}
+
+
+  # integration_test:
+  #   name: Integration Test
+  #   needs: build_with_smoke_test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+
+  #     - name: Set up Docker Compose
+  #       run: |
+  #         docker compose up -d
+  #         sleep 10
+
+  #     - name: Run integration tests
+  #       run: |
+  #         curl --fail -X POST http://localhost:5001/users -H "Content-Type: application/json" -d '{"name": "TestUser"}'
+  #         curl --fail -X POST http://localhost:5002/products -H "Content-Type: application/json" -d '{"name": "TestProduct", "price": 10.0}'
+  #         curl --fail -X POST http://localhost:5003/orders -H "Content-Type: application/json" -d '{"product_id": 1, "quantity": 1}'
+  #         curl --fail -X POST http://localhost:5004/notify -H "Content-Type: application/json" -d '{"order_id": 1}'
+
+  #     - name: Cleanup
+  #       if: always()
+  #       run: docker compose down
