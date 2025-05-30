@@ -100,7 +100,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [user_service, product_service, notification_service, order_service, database]
+        service: [user_service, product_service, notification_service, order_service]
 
     steps:
       - name: Checkout code
@@ -164,8 +164,5 @@ jobs:
       - name: Build and push image
         run: |
           SERVICE_DIR="./services/${{ matrix.service }}"
-          if [[ "${{ matrix.service }}" == "database" ]]; then
-            SERVICE_DIR="./database"
-          fi
           docker build -t ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }} $SERVICE_DIR
           docker push ${{ steps.vars.outputs.repo }}:${{ env.IMAGE_TAG }}

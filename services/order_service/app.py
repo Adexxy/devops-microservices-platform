@@ -1,11 +1,27 @@
 # services/order-service/app.py
 from flask import Flask, jsonify, request  # type: ignore
+from flask_sqlalchemy import SQLAlchemy  # type: ignore
 import requests
 app = Flask(__name__)
 
-ORDERS = []
+# ORDERS = []
+# Configure your RDS PostgreSQL connection here
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://<user>:<password>@<rds-endpoint>:5432/<dbname>'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
 PRODUCT_SERVICE_URL = "http://product-service.microservices.svc.cluster.local"
 
+# SQLAlchemy model for orders
+class Order(db.Model):
+    __tablename__ = 'orders'
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer)
+    quantity = db.Column(db.Integer)
+
+# Auto-create tables if they don't exist
+with app.app_context():
+    db.create_all()
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -14,7 +30,11 @@ def health():
 
 @app.route('/orders', methods=['GET'])
 def list_orders():
-    return jsonify(ORDERS)
+    orders = Order.query.all()
+    return jsonify([
+        {'id': o.id, 'product_id': o.product_id, 'quantity': o.quantity}
+        for o in orders
+    ])
 
 
 @app.route('/orders', methods=['POST'])
@@ -24,13 +44,10 @@ def create_order():
     resp = requests.get(f"{PRODUCT_SERVICE_URL}/products/{data['product_id']}")
     if resp.status_code != 200:
         return jsonify({'error': 'Product not found'}), 400
-    order = {
-        'id': len(ORDERS) + 1,
-        'product_id': data['product_id'],
-        'quantity': data.get('quantity', 1)
-    }
-    ORDERS.append(order)
-    return jsonify(order), 201
+    order = Order(product_id=data['product_id'], quantity=data.get('quantity', 1))
+    db.session.add(order)
+    db.session.commit()
+    return jsonify({'id': order.id, 'product_id': order.product_id, 'quantity': order.quantity}), 201
 
 
 if __name__ == '__main__':

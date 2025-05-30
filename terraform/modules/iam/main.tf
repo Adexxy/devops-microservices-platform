@@ -13,6 +13,11 @@ resource "aws_iam_role" "eks_node_group_role" {
       }
     ]
   })
+  
+  tags = {
+    Name        = "eks-node-group-role-${var.environment}"
+    Environment = var.environment
+  }
 }
 
 # Required for node group functionality

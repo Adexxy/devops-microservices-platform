@@ -8,5 +8,10 @@ resource "aws_ecr_repository" "services" {
   image_scanning_configuration {
     scan_on_push = true
   }
+
+  tags = {
+    Name        = each.key
+    Environment = var.environment
+  }
 }
 

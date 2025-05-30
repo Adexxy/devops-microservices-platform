@@ -19,6 +19,11 @@ resource "aws_eks_cluster" "microservices_cluster" {
   depends_on = [
     aws_iam_role_policy_attachment.cluster_AmazonEKSClusterPolicy,
   ]
+
+  tags = {
+    Name        = "eks-cluster-${var.cluster_name}"
+    Environment = var.environment
+  }
 }
 
 resource "aws_iam_role" "cluster" {

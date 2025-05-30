@@ -23,3 +23,8 @@ variable "security_groups" {
   description = "List of security group IDs to associate with the RDS instance"
   type        = list(string)
 }
+
+variable "environment" {
+  description = "Environment for the RDS instance (e.g., dev, prod)"
+  type        = string
+}

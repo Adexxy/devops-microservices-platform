@@ -25,7 +25,8 @@ module "eks" {
   vpc_id         = module.vpc.vpc_id
   cluster_name   = var.eks_cluster_name
   azs            = var.azs
-  private_subnets = module.vpc.private_subnet_ids  
+  private_subnets = module.vpc.private_subnet_ids 
+  environment    = var.environment 
 }
 
 module "rds" {
@@ -35,6 +36,7 @@ module "rds" {
   db_password    = var.db_password
   subnet_ids     = module.vpc.private_subnet_ids
   security_groups = [module.vpc.private_sg_id]
+  environment    = var.environment
 }
 
 # module "s3" {
@@ -45,7 +47,7 @@ module "rds" {
 module "ecr" {
   source        = "./modules/ecr"
   service_names = var.ecr_service_names
-  # No additional attributes needed unless required by the module
+  environment   = var.environment
 }
 
 module "node_group" {

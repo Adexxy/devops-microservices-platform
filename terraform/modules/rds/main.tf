@@ -1,5 +1,5 @@
 # Module: `modules/rds/main.tf`
-resource "aws_db_subnet_group" "default" {
+resource "aws_db_subnet_group" "postres_subnet_group" {
   name       = "rds-subnet-group"
   subnet_ids = var.subnet_ids
 }
@@ -15,7 +15,13 @@ resource "aws_db_instance" "postgres" {
   publicly_accessible  = false
   vpc_security_group_ids = var.security_groups
   db_name              = var.db_name
-  db_subnet_group_name = aws_db_subnet_group.default.name
+  db_subnet_group_name = aws_db_subnet_group.postres_subnet_group.name
+  
+  tags = {
+    Name = "postgres-db-instance"
+    Environment = var.environment
+  }
 }
+
 
 

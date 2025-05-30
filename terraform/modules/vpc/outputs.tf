@@ -20,6 +20,15 @@ output "private_sg_id" {
   value = aws_security_group.private_sg.id
 }
 
+output "vpc_security_group_ids" {
+  description = "List of security group IDs for the VPC"
+  value = [
+    aws_security_group.public_sg.id,
+    aws_security_group.private_sg.id
+  ]
+  
+}
+
 # output "default_sg_id" {
 #   value = aws_security_group.microservices_sg.id
 # }

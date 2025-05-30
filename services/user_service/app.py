@@ -1,11 +1,22 @@
 from flask import Flask, jsonify, request, abort  # type: ignore
+from flask_sqlalchemy import SQLAlchemy  # type: ignore
+
 app = Flask(__name__)
 
-# In-memory store
-users = [
-    {'id': 1, 'name': 'Alice'},
-    {'id': 2, 'name': 'Bob'}
-]
+# Configure your RDS PostgreSQL connection here
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://<user>:<password>@<rds-endpoint>:5432/<dbname>'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+# SQLAlchemy model for users
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+
+# Auto-create tables if they don't exist
+with app.app_context():
+    db.create_all()
 
 
 # Health check endpoint
@@ -16,15 +27,16 @@ def health():
 
 @app.route('/users', methods=['GET'])
 def list_users():
-    return jsonify(users)
+    users = User.query.all()
+    return jsonify([{'id': u.id, 'name': u.name} for u in users])
 
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-    u = next((u for u in users if u['id'] == user_id), None)
+    u = User.query.get(user_id)
     if not u:
         abort(404)
-    return jsonify(u)
+    return jsonify({'id': u.id, 'name': u.name})
 
 
 @app.route('/users', methods=['POST'])
@@ -32,28 +44,32 @@ def create_user():
     data = request.get_json()
     if not data or 'name' not in data:
         abort(400)
-    new_id = max(u['id'] for u in users) + 1
-    user = {'id': new_id, 'name': data['name']}
-    users.append(user)
-    return jsonify(user), 201
+    user = User(name=data['name'])
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'id': user.id, 'name': user.name}), 201
 
 
 @app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     data = request.get_json()
-    u = next((u for u in users if u['id'] == user_id), None)
-    if not u:
+    user = User.query.get(user_id)
+    if not user:
         abort(404)
     if not data or 'name' not in data:
         abort(400)
-    u['name'] = data['name']  # type: ignore
-    return jsonify(u)
+    user.name = data['name']
+    db.session.commit()
+    return jsonify({'id': user.id, 'name': user.name})
 
 
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
-    global users
-    users = [u for u in users if u['id'] != user_id]
+    user = User.query.get(user_id)
+    if not user:
+        abort(404)
+    db.session.delete(user)
+    db.session.commit()
     return '', 204
 
 

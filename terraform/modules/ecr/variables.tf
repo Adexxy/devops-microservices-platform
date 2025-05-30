@@ -4,3 +4,7 @@ variable "service_names" {
   type        = list(string)
 }
 
+variable "environment" {
+  description = "Environment for the ECR repositories (e.g., dev, prod)"
+  type        = string
+}
