@@ -2,6 +2,9 @@
 
 This project is a complete, end-to-end **cloud-native microservices platform** built to showcase advanced **DevOps skills** using a modern CI/CD pipeline, infrastructure-as-code, configuration management, container orchestration, and automation tools.
 
+> ⚠️ **Note:**  
+> **Emphasis is on the automation workflow and not the functionality of the apps.**
+
 > ✅ Ideal for portfolio, demo, or learning advanced DevOps workflows.
 
 ---
@@ -16,7 +19,7 @@ This platform consists of a 4-tier microservices application, containerized with
 
 | Layer | Tools |
 |------|-------|
-| **Source Control & CI/CD** | Git, GitHub, GitHub Actions, Jenkins (optional), CircleCI (optional) |
+| **Source Control & CI/CD** | Git, GitHub, GitHub Actions |
 | **Containerization** | Docker |
 | **Orchestration** | Kubernetes (EKS) |
 | **Infrastructure as Code** | Terraform |
@@ -31,14 +34,15 @@ This platform consists of a 4-tier microservices application, containerized with
 ## 🧱 Microservices Architecture
 
 ```
-
-\[ user-service ]       \[ product-service ]
-\|                       |
-\|                       |
-\[ order-service ]     \[ notification-service ]
-|
-\[ PostgreSQL DB ]
-
+[user-service]      [product-service]
+      |                   |
+      +--------+----------+
+               |
+        [order-service]
+               |
+    [notification-service]
+               |
+         [PostgreSQL DB]
 ```
 
 - All services are containerized and communicate over internal Kubernetes networking.
@@ -49,13 +53,12 @@ This platform consists of a 4-tier microservices application, containerized with
 ## 🗂️ Project Structure
 
 ```
-
 .
 ├── services/
-│   ├── user\_service/
-│   ├── product\_service/
-│   ├── order\_service/
-│   ├── notification\_service/
+│   ├── user_service/
+│   ├── product_service/
+│   ├── order_service/
+│   ├── notification_service/
 ├── infrastructure/
 │   └── terraform/      # AWS EKS, VPC, RDS setup
 ├── ansible/
@@ -66,10 +69,9 @@ This platform consists of a 4-tier microservices application, containerized with
 │   └── automation.py   # Python automation utilities
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml  # GitHub Actions CI/CD pipeline
+│       └── python-app.yml  # GitHub Actions CI/CD pipeline
 └── README.md
-
-````
+```
 
 ---
 
@@ -77,7 +79,7 @@ This platform consists of a 4-tier microservices application, containerized with
 
 - 🛠️ **Infrastructure-as-Code**: Provision AWS resources with Terraform
 - 📦 **Containerization**: Dockerize each microservice independently
-- 🚀 **CI/CD**: Automatically build, push, and deploy services via GitHub Actions
+- 🚀 **CI/CD**: Automatically build, test, push, and deploy services via GitHub Actions
 - 🐳 **Orchestration**: Run all services in Kubernetes using Helm charts
 - ⚙️ **Ansible Bootstrapping**: Setup of EC2 instances, kubeconfig, Docker engine
 - 🔒 **Ingress**: NGINX ingress controller with path-based routing
@@ -95,54 +97,65 @@ This platform consists of a 4-tier microservices application, containerized with
 - GitHub Secrets configured:
   - `DOCKER_USERNAME`
   - `DOCKER_PASSWORD`
-  - `KUBECONFIG_SECRET` (base64-encoded or plaintext kubeconfig)
+  - `AWS_ACCESS_KEY_ID`
+  - `AWS_SECRET_ACCESS_KEY`
+  - `AWS_REGION`
+  - `AWS_ACCOUNT_ID`
 
 ---
 
-### 1. Provision Infrastructure (Terraform)
+### 1. Bootstrap S3 (for Terraform backend)
+
+```bash
+cd terraform/bootstrap
+terraform init
+terraform apply
+```
+
+Installs:
+
+- S3 bucket
+
+---
+
+### 2. Provision Infrastructure (Terraform)
 
 ```bash
 cd infrastructure/terraform
 terraform init
 terraform apply
-````
+```
 
 Creates:
 
-* VPC
-* EKS Cluster
-* IAM roles
-* RDS PostgreSQL (optional)
+- VPC
+- ECR
+- Node Group
+- EKS Cluster
+- IAM roles
+- RDS PostgreSQL
 
 ---
 
-### 2. Bootstrap EC2 Nodes (Ansible)
+### 3. Build, Test & Push Microservices (CI/CD Pipeline)
 
-```bash
-cd ansible/playbooks
-ansible-playbook setup-k8s-nodes.yml -i inventory
-```
+#### **Automated via GitHub Actions:**
 
-Installs:
+- **Static Code Analysis:** Lint each service with flake8.
+- **Unit Tests:** Run pytest for each service.
+- **Build & Smoke Test:** Build Docker images, run each container, and check `/health` endpoint.
+- **Integration Test:** Start all containers in a shared Docker network, run end-to-end API tests between services.
+- **Push:** Only if all tests pass, images are pushed to ECR or Docker Hub.
 
-* Docker
-* kubelet, kubeadm
-* Helm, kubectl
-* Configures node joining
-
----
-
-### 3. Build & Push Microservices (GitHub Actions or manually)
-
-Manual:
+#### **Manual Example:**
 
 ```bash
 docker build -t user-service ./services/user_service
+docker run -d -p 5001:5001 user-service
+curl http://localhost:5001/health
 docker tag user-service:latest yourdockerhub/user-service:latest
 docker push yourdockerhub/user-service:latest
 ```
-
-Or let GitHub Actions do it automatically on `git push`.
 
 ---
 
@@ -155,47 +168,39 @@ helm upgrade --install microservices . -f values.yaml
 
 ---
 
-### 5. Access the Application
+## 🔁 CI/CD Pipeline Details
 
-Ensure NGINX Ingress Controller is installed:
+### 🛠️ Optional/Custom Flow
 
-```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/aws/deploy.yaml
-```
+The CI/CD pipeline is designed for **flexibility** to support both default and custom workflows:
+This enables you to run your desired workflow for desired services like dockerhub or AWS ECR, customs kubernetes server, AWS EKS or AWS ECS.
 
-Then access services via:
+**Workflow:** python-app.yml
 
-```
-http://<external-ip>/user
-http://<external-ip>/product
-http://<external-ip>/order
-http://<external-ip>/notification
-```
-
-Use `kubectl get ingress` to fetch the external IP or hostname.
+- **Trigger:** Push to `main`, PR, or manual dispatch
+- **Stages:**
+  1. **Static Code Analysis:** Lint with flake8
+  2. **Unit Testing:** Run pytest
+  3. **Build & Smoke Test:** Build Docker image, run container, check `/health`
+  4. **Integration Test:** Start all containers, run cross-service API tests
+  5. **Push:** Push image to registry only if all tests pass
 
 ---
 
-## 🔁 CI/CD Pipeline
+### ⚡ How to Use
 
-GitHub Actions Workflow (`.github/workflows/deploy.yml`):
-
-* Trigger: Push to `main`
-* Steps:
-
-  * Build and push Docker images
-  * Deploy via Helm
-  * Optionally notify via Slack/Webhooks
+- **Edit `.github/workflows/python-app.yml`** to adjust the matrix, add `if:` conditions, or expose workflow inputs.
+- **Trigger manually** from the GitHub Actions UI for custom runs.
 
 ---
 
 ## 📌 Future Enhancements
 
-* [ ] Add Prometheus + Grafana for monitoring
-* [ ] Add Jaeger for distributed tracing
-* [ ] Add external-dns for Route53 integration
-* [ ] Add TLS support via cert-manager
-* [ ] Add unit/integration test stages in pipeline
+- [ ] Add Prometheus + Grafana for monitoring
+- [ ] Add Jaeger for distributed tracing
+- [ ] Add external-dns for Route53 integration
+- [ ] Add TLS support via cert-manager
+- [ ] Add more advanced test stages in pipeline
 
 ---
 
@@ -205,20 +210,10 @@ This lab was built to simulate a real-world DevOps workflow with cloud-native to
 
 ---
 
-## 📄 License
-
-
-
----
-
 ## 📬 Contact
 
-**Your Name**
-Email: [you@example.com](mailto:adexxy@live.com)
-GitHub: [@your-github-handle](https://github.com/your-github-handle)
-
-```
+**Your Name**  
+Email: [adexxy@live.com](mailto:adexxy@live.com)  
+GitHub: [@Adexxy](https://github.com/adexxy)
 
 ---
-
-
