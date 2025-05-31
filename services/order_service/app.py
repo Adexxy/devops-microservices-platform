@@ -13,7 +13,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:/
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-PRODUCT_SERVICE_URL = "http://product-service.microservices.svc.cluster.local"
+# PRODUCT_SERVICE_URL = "http://product-service.microservices.svc.cluster.local"
+# In order_service/app.py
+PRODUCT_SERVICE_URL = os.environ.get("PRODUCT_SERVICE_URL", "http://product_service:5002")
 
 # SQLAlchemy model for orders
 class Order(db.Model):
