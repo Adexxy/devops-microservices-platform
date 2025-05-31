@@ -222,7 +222,7 @@ jobs:
           docker run -d --name user_service --network microservices-net -p 5001:5001 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/user_service:${{ env.IMAGE_TAG }}
           docker run -d --name product_service --network microservices-net -p 5002:5002 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/product_service:${{ env.IMAGE_TAG }}
           docker run -d --name order_service --network microservices-net -p 5003:5003 -e DATABASE_URL=sqlite:///:memory: -e PRODUCT_SERVICE_URL=http://product_service:5002 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/order_service:${{ env.IMAGE_TAG }}
-          docker run -d --name notification_service --network microservices-net -p 5004:5004  ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/notification_service:${{ env.IMAGE_TAG }}
+          docker run -d --name notification_service --network microservices-net -p 5004:5004 -e ORDER_SERVICE_URL=http://order_service:5003 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/notification_service:${{ env.IMAGE_TAG }}
           sleep 10  # allow all to boot
 
       - name: Run integration tests

@@ -12,7 +12,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:/
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-ORDER_SERVICE_URL = "http://order-service.microservices.svc.cluster.local"
+ORDER_SERVICE_URL = os.environ.get("ORDER_SERVICE_URL", "http://order-service.microservices.svc.cluster.local")
 
 # SQLAlchemy model for notifications
 class Notification(db.Model):
