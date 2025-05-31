@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  user_service:
+    image: .../user_service:${IMAGE_TAG}
+    ports: ["5001:5001"]
+    environment:
+      DATABASE_URL: "sqlite:///:memory:"
+
+  product_service:
+    image: .../product_service:${IMAGE_TAG}
+    ports: ["5002:5002"]
+    environment:
+      DATABASE_URL: "sqlite:///:memory:"
+
+  order_service:
+    image: .../order_service:${IMAGE_TAG}
+    ports: ["5003:5003"]
+    environment:
+      DATABASE_URL: "sqlite:///:memory:"
+      PRODUCT_SERVICE_URL: "http://product_service:5002"
+
+  notification_service:
+    image: .../notification_service:${IMAGE_TAG}
+    ports: ["5004:5004"]
+    environment:
+      DATABASE_URL: "sqlite:///:memory:"

@@ -213,6 +213,10 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
           docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+      
+      - name: Create network
+        run: docker network create micro_net
+
       - name: Run all containers
         run: |
           docker run -d --name user_service -p 5001:5001 ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/user_service:${{ env.IMAGE_TAG }}
