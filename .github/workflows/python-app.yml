@@ -236,6 +236,18 @@ jobs:
         if: failure()
         run: docker logs order_service
 
+      - name: Show notification_service logs
+        if: failure()
+        run: docker logs notification_service
+
+      - name: Show user_service logs
+        if: failure()
+        run: docker logs user_service
+
+      - name: Show product_service logs
+        if: failure()
+        run: docker logs product_service
+
       - name: Cleanup
         if: always()
         run: docker rm -f user_service product_service order_service notification_service || true
